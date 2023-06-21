@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Flying Bird!</title>
+        <link rel="icon" href="./flying_bird.ico">
+    </head>
+</html>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+    body {
+        background-color: beige;
+    }
+
+    #header {
+        color : blueviolet;
+        font-size : 80px;
+        font-family: 'Pacifico', cursive;
+        margin : 30px 0 0 0 ;
+    }
+
+    p {
+        margin : 0;
+    }
+
+    span {
+        font-size : 30px;
+        font-family: 'Pacifico', cursive;
+    }
+
+    #highScore {
+        margin-right : 100px;
+        color : red;
+        font-size : 50px;
+    }
+
+    #score {
+        font-size : 50px;
+    }
+
+    #move, #jump {
+        margin-right : 50px;
+    }
+
+    #canvas {
+        background-color: skyblue;
+    }
+
+    #copyright {
+        margin-top : 10px;
+        padding : 10px;
+        background-color : rgb(66, 66, 66);
+        color : white;        
+    }
+</style>
+
+<body>
+    
+    <CENTER><h1 id="header">Flying Bird !!</h1></CENTER>
+
+    <CENTER><p id="scorelist">
+        <span>High Score : </span><span id="highScore">0</span>
+        <span>Score : </span><span id="score">0</span>
+    </p></CENTER>
+
+    <CENTER><canvas id="canvas"></canvas></CENTER>
+
+    <CENTER><p id="keyGuide">
+        <span id="move">← → : 이동</span>
+        <span id="jump">Space : 점프 / 시작</span>
+        <span id="restart">R : 재시작</span>
+    </p></CENTER>
+
+    <CENTER><p id="copyright">Copyright 2023. MinKyuPark All rights reserved.</p></CENTER>
+
+</body>
+<script src="index.js"></script>
