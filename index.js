@@ -5,6 +5,7 @@ var ctx = canvas.getContext('2d');
 canvas.width = 700;
 canvas.height = 500;
 
+// High Score, Score Element 선택
 var highScoreElem = document.querySelector('#highScore');
 var scoreElem = document.querySelector('#score');
 
@@ -35,6 +36,10 @@ var animation;
 // 이미지 객체 생성
 var birdImage = new Image();
 birdImage.src = './bird1.png';
+var pipeImage1 = new Image();
+pipeImage1.src = './pipeImage1.png';
+var pipeImage2 = new Image();
+pipeImage2.src = './pipeImage2.png';
 
 // 객체 형태로 변수 생성
 var bird = {
@@ -44,16 +49,10 @@ var bird = {
     width : 50,
     height : 50,
     draw() {
-        // 이미지로 그리기 (hit 박스와 이미지간 차이 줄이기 위해 -7)
+        // 이미지로 그리기 (hit 박스와 이미지간 간격 차이 줄이기 위해 -7)
         ctx.drawImage(birdImage, this.x - 7, this.y - 7);
     }
 }
-
-// 이미지 객체 생성
-var pipeImage1 = new Image();
-pipeImage1.src = './pipeImage1.png';
-var pipeImage2 = new Image();
-pipeImage2.src = './pipeImage2.png';
 
 // 장애물은 많이 만들것이기 때문에 class로 정의
 class Pipe {
@@ -79,7 +78,7 @@ function doReady() {
     animation = requestAnimationFrame(doReady);
     timer++;
 
-    // 15 프레임마다 스타일을 바꾼다
+    // 프레임마다 r, g, b 변수를 이용해 스타일을 바꾼다
     if (timer < 60) {
         if (g < 255) {
             g += 6;
@@ -140,7 +139,7 @@ function doReady() {
         a.x -= 10;
         a.draw();
     })
-    // 대기 중 bird 컨트롤
+    // 대기 중 bird x, y 좌표 컨트롤
     if ((timer > 0) && (timer < 120)) {
         if (bird.y > 225) {
             bird.y -= 4;
@@ -167,14 +166,18 @@ function doReady() {
     }
     
     // 10 프레임마다 이미지를 바꾼다
+    // 날고 있는 듯한 애니메이션 효과
     if ((timer % 20) < 10) {
         birdImage.src = './bird2.png';
     } else {
         birdImage.src = './bird1.png';
     }
+    
     // bird를 canvas에 그린다
     bird.draw();
 
+    // 초기 상태에서는 계속 반복되는 화면이므로
+    // timer가 360이상 갈 일이 없다
     if (timer === 360) {
         timer = 0;
     }
@@ -215,8 +218,9 @@ function doPlaying() {
 
     // 1.5초(=90프레임)마다 실행되게 하는 조건
     if (timer % 90 === 0) {
-        // 장애물 생성 후 배열에 저장 (이때 y좌표 랜덤으로 생성)
+        // 장애물 생성 후 배열에 저장
         var pipe = new Pipe();
+        // y 좌표를 랜덤으로 설정한다
         pipe.y = Math.floor(Math.random() * 300) + 100; 
         pipeArray.push(pipe);
     } 
@@ -240,12 +244,18 @@ function doPlaying() {
 
     // 점프중이면 올라감
     if (jumping == true) {
-        bird.y -= 5;
+        // 캔버스에서 벗어나지 않기
+        if (bird.y > 5) {
+            bird.y -= 5;
+        }        
         jumpTimer++;
     }
     // 점프중이 아니면 계속 내려감
     if ((timer > 120) && (jumping == false)) {
-        bird.y += 5;
+        // 캔버스에서 벗어나지 않기
+        if (bird.y < 445) {
+            bird.y += 5;
+        }
     }
     // 점프timer가 15 넘으면 점프중 끄고, 점프timer 초기화
     if (jumpTimer > 15) {
@@ -255,7 +265,10 @@ function doPlaying() {
 
     // 왼쪽으로 움직이기 (moveTimer를 이용해 어느정도까지 움직이고 멈춤)
     if (movingLeft == true) {
-        bird.x -= 4;
+        // 캔버스에서 벗어나지 않기
+        if (bird.x > 4) {
+            bird.x -= 4;
+        }
         moveLeftTimer++;
     }
     if (moveLeftTimer > 15) {
@@ -265,7 +278,10 @@ function doPlaying() {
 
     // 오른쪽으로 움직이기 (moveTimer를 이용해 어느정도까지 움직이고 멈춤)
     if (movingRight == true) {
-        bird.x += 4;
+        // 캔버스에서 벗어나지 않기
+        if (bird.x < 650) {
+            bird.x += 4;
+        }
         moveRightTimer++;
     }
     if (moveRightTimer > 15) {
@@ -274,6 +290,7 @@ function doPlaying() {
     }
     
     // 10 프레임마다 이미지를 바꾼다
+    // 날고 있는 듯한 애니메이션 효과
     if ((timer % 20) < 10) {
         birdImage.src = './bird2.png';
     } else {
@@ -284,9 +301,9 @@ function doPlaying() {
 }
 
 // 충돌 확인하는 함수
-function isCollision(dino, cactus) {
-    var xGap = dino.x - cactus.x;
-    var yGap = cactus.y - dino.y;
+function isCollision(bird, pipe) {
+    var xGap = bird.x - pipe.x;
+    var yGap = pipe.y - bird.y;
     
     // 장애물과 유닛의 x, y 값 차이를 이용해 충돌여부 확인
     if ((xGap > -50 && xGap < 35) && (yGap < -25 || yGap > 75)) {
@@ -324,6 +341,7 @@ document.addEventListener('keydown', function(e) {
         // 스페이스 바 입력 시 다음 상태로 넘어감
         if (e.code === 'Space') {
             state = 1;
+            // 변수 초기화
             timer = 0;
             jumpTimer = 0;
             bird.x = 50;
@@ -355,7 +373,7 @@ document.addEventListener('keydown', function(e) {
     if (state === 2) {
         // 스페이스 바 입력 시 초기 상태로 돌아간다
         if (e.code === 'KeyR') {
-            // 변수들 다 초기화 시켜준다
+            // 변수 초기화
             state = 0;
             timer = 0;
             jumpTimer = 0;
